@@ -120,11 +120,15 @@
   // get service worker object
   var _serviceWorker = navigator.serviceWorker;
 
+  // don't run upup on facebook in-app browser
+  var _ua = navigator.userAgent || navigator.vendor || window.opera || '';
+  var _isFbInAppBrowser = (_ua.indexOf("FBAN") > -1) || (_ua.indexOf("FBAV") > -1);
+
   // Check browser support
   // This is done as early as possible, to make it as fast as possible for unsupported browsers
   // Requires service worker
-  if (!_serviceWorker) {
-    _root.UpUp = null;
+  if (!_serviceWorker || _isFbInAppBrowser) {
+    _root.UpUp = { start: function () { }, debug: function() {}, addSettings: function() {}};
     return undefined;
   }
 
