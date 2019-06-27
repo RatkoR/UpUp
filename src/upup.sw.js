@@ -24,7 +24,7 @@ var _calculateHash = function(input) {
 
 // Register message event listener
 self.addEventListener('message', function(event) {
-  // place offline message in cache
+    // place offline message in cache
   if (event.data.action === 'set-settings') {
     _parseSettingsAndCache(event.data.settings);
   }
@@ -32,6 +32,28 @@ self.addEventListener('message', function(event) {
 
 // Register fetch event listener
 self.addEventListener('fetch', function(event) {
+  /**
+   * Apple needs Range header when doing 206 request. fetch() does
+   * not support it so we have to bail-out and we don't let fetch()
+   * handle this kind of requests.
+   */
+  if (event.request && event.request.headers && event.request.headers.has('range')) {
+    return;
+  }
+
+  /**
+   * Don't do anything for video chunks
+   */
+  if (event.request.url.indexOf('.ts') !== -1) {
+    return;
+  }
+
+  // Let the browser do its default thing
+  // for non-GET requests.
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     // try to return untouched request from network first
     fetch(event.request).catch(function() {
