@@ -48,6 +48,13 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
+  /**
+   * Don't do anything for vast.php - it messes up with adblockers
+   */
+  if (event.request.url.indexOf('vast.php') !== -1) {
+    return;
+  }
+
   // Let the browser do its default thing
   // for non-GET requests.
   if (event.request.method !== 'GET') {
